@@ -1,4 +1,6 @@
 import configparser
+import json
+from json import JSONDecodeError
 from typing import Dict, List
 
 _FAKE_SECTION_NAME = "all"
@@ -8,13 +10,17 @@ _EXPORT_COMMAND = "export "
 
 def read_variables(config_location: str) -> Dict[str, str]:
     """
-    Reads variables out of a config file. Variables can be in a (section-less) ini file or in a shell file used to
-    source the variables (i.e. one that has just got "export *" like statements in it.
+    Reads variables out of a config file. Variables can be in a ini file, a shell file used to source the variables
+    (i.e. one that has just got "export *" like statements in it) or in JSON.
     :param config_location: the location of the config file
     :return: dictionary where the variable names are key and their values are the values
     """
     with open(config_location, "r") as config_file:
         config_lines = config_file.readlines()
+    try:
+        return json.loads("".join(config_lines))
+    except JSONDecodeError:
+        pass
     config_lines = _shell_to_ini(config_lines)
     return _read_ini_config("\n".join(config_lines))
 
