@@ -11,7 +11,7 @@ _logger = logging.getLogger(__name__)
 _logger.addHandler(logging.StreamHandler())
 
 
-class Updater:
+class ProjectVariablesUpdater:
     """
     Updates variables for projects in GitLab CI, as defined by a configuration file.
     """

@@ -1,14 +1,13 @@
 import argparse
 import json
 import sys
-from pprint import pprint
 from typing import List
 
-from gitlabbuildvariables.executables._common import RunConfig, add_common_arguments
+from gitlabbuildvariables.executables._common import add_common_arguments, ProjectRunConfig
 from gitlabbuildvariables.manager import ProjectBuildVariablesManager
 
 
-def _parse_args(args: List[str]) -> RunConfig:
+def _parse_args(args: List[str]) -> ProjectRunConfig:
     """
     Parses the given CLI arguments to get a run configuration.
     :param args: CLI arguments
@@ -16,9 +15,9 @@ def _parse_args(args: List[str]) -> RunConfig:
     """
     parser = argparse.ArgumentParser(prog="gitlab-get-variables", description="Tool for getting a GitLab project's "
                                                                               "build variables")
-    add_common_arguments(parser)
+    add_common_arguments(parser, project=True)
     arguments = parser.parse_args(args)
-    return RunConfig(arguments.url, arguments.token, arguments.project)
+    return ProjectRunConfig(project=arguments.project, url=arguments.url, token=arguments.token, debug=arguments.debug)
 
 
 def main():

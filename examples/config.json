@@ -1,0 +1,4 @@
+{
+    "cn13/my-project-1": ["common"],
+    "cn13/my-project-2": ["common", "project"]
+}

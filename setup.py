@@ -20,7 +20,8 @@ setup(
     entry_points={
         "console_scripts": [
             "gitlab-set-variables=gitlabbuildvariables.executables.gitlab_set_variables:main",
-            "gitlab-get-variables=gitlabbuildvariables.executables.gitlab_get_variables:main"
+            "gitlab-get-variables=gitlabbuildvariables.executables.gitlab_get_variables:main",
+            "gitlab-update-variables=gitlabbuildvariables.executables.gitlab_update_variables:main"
         ]
     }
 )
