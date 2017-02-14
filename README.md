@@ -63,3 +63,4 @@ $ gitlab-get-variables --url ${gitlab_url} --token ${access_token} group/my-proj
 $ gitlab-set-variables --url ${gitlab_url} --token ${access_token} my-project my-variables.sh 
 Variables for project "my-project" set to: {'VALUE_1': 'abc', 'VALUE_2': 'def', 'VALUE_3': 'ghi'}
 ```
+

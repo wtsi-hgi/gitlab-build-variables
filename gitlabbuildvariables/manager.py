@@ -22,7 +22,7 @@ class ProjectBuildVariablesManager:
     """
     Manages the build variables used by a project.
     """
-    def __init__(self, url:str, token: str, project: str):
+    def __init__(self, url: str, token: str, project: str):
         """
         Constructor.
         :param url: the URL for GitLab (must be HTTPS to avoid https://github.com/gpocentek/python-gitlab/issues/218)
