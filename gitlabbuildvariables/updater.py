@@ -1,10 +1,11 @@
 import json
 import os
-from typing import List, Dict
+from abc import ABCMeta, abstractmethod
+from typing import List, Dict, Set
 
 import logging
 
-from gitlabbuildvariables._common import GitLabConfig
+from gitlabbuildvariables.common import GitLabConfig
 from gitlabbuildvariables.manager import ProjectVariablesManager
 from gitlabbuildvariables.reader import read_variables
 
@@ -12,33 +13,46 @@ _logger = logging.getLogger(__name__)
 _logger.addHandler(logging.StreamHandler())
 
 
-class ProjectVariablesUpdater:
+class VariablesUpdater(metaclass=ABCMeta):
+    """
+    Constructor.
+    :param gitlab_config: configuration required to access GitLab
+    :param setting_repositories: directories that may contain variable source files (highest preference first)
+    :param default_setting_extensions: file extensions that variable source files could have if that given is not
+    found(highest preference first, e.g. ["json", "init"])
+    """
+    def __init__(self, gitlab_config: GitLabConfig, setting_repositories: List[str]=None,
+                 default_setting_extensions: List[str]=None):
+        self.gitlab_config = gitlab_config
+        self.setting_repositories = setting_repositories if setting_repositories is not None else []
+        self.default_setting_extensions = default_setting_extensions if default_setting_extensions is not None else []
+
+    @abstractmethod
+    def update(self):
+        """
+        Updates the appropriate GitLab CI build variables.
+        """
+
+
+class ProjectVariablesUpdater(VariablesUpdater):
     """
     Updates variables for a project in GitLab CI.
     """
-    def __init__(self, project: str, gitlab_config: GitLabConfig, setting_repositories: List[str]=None,
-                 default_setting_extensions: List[str]=None):
+    def __init__(self, project: str, setting_sources: Set[str], *args, **kwargs):
         """
         Constructor.
         :param project: name or ID of the project to update variables for
-        :param gitlab_config: configuration required to access GitLab
-        :param setting_repositories: directories that may contain variable source files (highest preference first)
-        :param default_setting_extensions: file extensions that variable source files could have if that given is not
-        found(highest preference first, e.g. ["json", "init"])
+        :param setting_sources: locations of variable settings that are to be sourced (lowest preference first)
         """
+        super().__init__(*args, **kwargs)
         self.project = project
-        self.default_setting_extensions = default_setting_extensions if default_setting_extensions is not None else []
-        self.setting_repositories = setting_repositories if setting_repositories is not None else []
-        self._variables_manager = ProjectVariablesManager(gitlab_config, project)
+        self.setting_sources = setting_sources
+        self._variables_manager = ProjectVariablesManager(self.gitlab_config, project)
 
-    def update(self, settings_locations: List[str]):
-        """
-        Updates the build variables for this project based on the variable settings sourced from the given locations.
-        :param settings_locations: locations of variable settings that are to be sourced (lowest preference first)
-        """
+    def update(self):
         variables = {}  # type: Dict[str, str]
-        for setting in settings_locations:
-            setting_location = self._resolve_setting_location(setting)
+        for setting_source_identifier in self.setting_sources:
+            setting_location = self._resolve_setting_location(setting_source_identifier)
             setting_variables = read_variables(setting_location)
             variables.update(setting_variables)
 
@@ -70,36 +84,28 @@ class ProjectVariablesUpdater:
         raise ValueError("Could not resolve location of settings identified by: \"%s\"" % identifier)
 
 
-class ProjectsVariablesUpdater:
+class ProjectsVariablesUpdater(VariablesUpdater):
     """
     Updates variables for projects in GitLab CI, as defined by a configuration file.
     """
-    def __init__(self, config_location: str, gitlab_config: GitLabConfig,
-                 setting_repositories: List[str]=None, default_setting_extensions: List[str]=None):
+    def __init__(self, config_location: str, *args, **kwargs):
         """
         Constructor.
         :param config_location: the location of the config file for setting project variables from variable sources
-        :param gitlab_config: configuration required to access GitLab
-        :param setting_repositories: directories that may contain variable source files (highest preference first)
-        :param default_setting_extensions: file extensions that variable source files could have if that given is not
-        found(highest preference first, e.g. ["json", "init"])
         """
+        super().__init__(*args, **kwargs)
         self.config_location = config_location
-        self.gitlab_config = gitlab_config
-        self.setting_repositories = setting_repositories if setting_repositories is not None else []
-        self.default_setting_extensions = default_setting_extensions if default_setting_extensions is not None else []
 
     def update(self):
-        """
-        Updates the project variables in GitLab to match those specified in the configuration file.
-        """
         with open(self.config_location, "r") as config_file:
             config = config_file.read()
         config = json.loads(config)
         _logger.info("Read config from \"%s\"" % self.config_location)
         _logger.debug("Config: %s" % config)
 
-        for project, settings in config.items():
+        for project, settings_sources in config.items():
             project_updater = ProjectVariablesUpdater(
-                project, self.gitlab_config, self.setting_repositories, self.default_setting_extensions)
-            project_updater.update(settings)
+                project, set(settings_sources), gitlab_config=self.gitlab_config,
+                setting_repositories=self.setting_repositories,
+                default_setting_extensions=self.default_setting_extensions)
+            project_updater.update()

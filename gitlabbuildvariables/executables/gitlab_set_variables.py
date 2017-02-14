@@ -4,7 +4,7 @@ from typing import List, Dict, Union
 
 import logging
 
-from gitlabbuildvariables._common import GitLabConfig
+from gitlabbuildvariables.common import GitLabConfig
 from gitlabbuildvariables.executables._common import add_common_arguments, RunConfig, ProjectRunConfig
 from gitlabbuildvariables.manager import ProjectVariablesManager
 from gitlabbuildvariables.reader import read_variables

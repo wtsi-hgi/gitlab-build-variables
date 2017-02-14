@@ -3,7 +3,7 @@ import json
 import sys
 from typing import List
 
-from gitlabbuildvariables._common import GitLabConfig
+from gitlabbuildvariables.common import GitLabConfig
 from gitlabbuildvariables.executables._common import add_common_arguments, ProjectRunConfig
 from gitlabbuildvariables.manager import ProjectVariablesManager
 

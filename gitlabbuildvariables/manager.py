@@ -2,7 +2,7 @@ from typing import Dict
 
 from gitlab import Gitlab, GitlabGetError
 
-from gitlabbuildvariables._common import GitLabConfig
+from gitlabbuildvariables.common import GitLabConfig
 
 SSL_VERIFY = False
 
