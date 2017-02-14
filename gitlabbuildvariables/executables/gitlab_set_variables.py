@@ -4,8 +4,9 @@ from typing import List, Dict, Union
 
 import logging
 
+from gitlabbuildvariables._common import GitLabConfig
 from gitlabbuildvariables.executables._common import add_common_arguments, RunConfig, ProjectRunConfig
-from gitlabbuildvariables.manager import ProjectBuildVariablesManager
+from gitlabbuildvariables.manager import ProjectVariablesManager
 from gitlabbuildvariables.reader import read_variables
 
 
@@ -40,7 +41,8 @@ def main():
     Main method.
     """
     run_config = _parse_args(sys.argv[1:])
-    manager = ProjectBuildVariablesManager(run_config.url, run_config.token, run_config.project)
+    gitlab_config = GitLabConfig(run_config.url, run_config.token)
+    manager = ProjectVariablesManager(gitlab_config, run_config.project)
     variables = {}  # type: Dict[str, str]
     for source in run_config.source:
         variables.update(read_variables(source))

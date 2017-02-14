@@ -3,8 +3,9 @@ import json
 import sys
 from typing import List
 
+from gitlabbuildvariables._common import GitLabConfig
 from gitlabbuildvariables.executables._common import add_common_arguments, ProjectRunConfig
-from gitlabbuildvariables.manager import ProjectBuildVariablesManager
+from gitlabbuildvariables.manager import ProjectVariablesManager
 
 
 def _parse_args(args: List[str]) -> ProjectRunConfig:
@@ -25,7 +26,8 @@ def main():
     Main method.
     """
     run_config = _parse_args(sys.argv[1:])
-    manager = ProjectBuildVariablesManager(run_config.url, run_config.token, run_config.project)
+    gitlab_config = GitLabConfig(run_config.url, run_config.token)
+    manager = ProjectVariablesManager(gitlab_config, run_config.project)
     output = json.dumps(manager.get_variables(), sort_keys=True, indent=4, separators=(",", ": "))
     print(output)
 

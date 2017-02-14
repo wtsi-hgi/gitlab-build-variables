@@ -3,8 +3,9 @@ import logging
 import sys
 from typing import List
 
+from gitlabbuildvariables._common import GitLabConfig
 from gitlabbuildvariables.executables._common import add_common_arguments, RunConfig
-from gitlabbuildvariables.updater import ProjectVariablesUpdater, _logger
+from gitlabbuildvariables.updater import ProjectsVariablesUpdater, _logger
 
 
 class _UpdateArgumentsRunConfig(RunConfig):
@@ -49,9 +50,10 @@ def main():
         _logger.setLevel(logging.DEBUG)
     else:
         _logger.setLevel(logging.INFO)
+    gitlab_config = GitLabConfig(run_config.url, run_config.token)
 
-    updater = ProjectVariablesUpdater(run_config.config_location, run_config.url, run_config.token,
-                                      run_config.setting_repositories, run_config.default_setting_extensions)
+    updater = ProjectsVariablesUpdater(run_config.config_location, gitlab_config, run_config.setting_repositories,
+                                       run_config.default_setting_extensions)
     updater.update()
 
 

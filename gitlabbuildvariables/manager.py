@@ -2,6 +2,8 @@ from typing import Dict
 
 from gitlab import Gitlab, GitlabGetError
 
+from gitlabbuildvariables._common import GitLabConfig
+
 SSL_VERIFY = False
 
 _VARIABLE_KEY_PROPERTY = "key"
@@ -18,18 +20,17 @@ if not SSL_VERIFY:
         pass
 
 
-class ProjectBuildVariablesManager:
+class ProjectVariablesManager:
     """
     Manages the build variables used by a project.
     """
-    def __init__(self, url: str, token: str, project: str):
+    def __init__(self, gitlab_config: GitLabConfig, project: str):
         """
         Constructor.
-        :param url: the URL for GitLab (must be HTTPS to avoid https://github.com/gpocentek/python-gitlab/issues/218)
-        :param token: GitLab access token
+        :param gitlab_config: configuration to access GitLab
         :param project: the project of interest (preferably namespaced, e.g. "hgi/my-project")
         """
-        self._connector = Gitlab(url, token, ssl_verify=SSL_VERIFY)
+        self._connector = Gitlab(gitlab_config.location, gitlab_config.token, ssl_verify=SSL_VERIFY)
         self._connector.auth()
         try:
             self._project = self._connector.projects.get(project)
