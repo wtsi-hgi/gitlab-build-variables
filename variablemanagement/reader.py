@@ -28,10 +28,11 @@ def _read_ini_config(ini_file_contents: str) -> Dict[str, str]:
     config = configparser.ConfigParser()
     config.read_string(_FAKE_SECTION + ini_file_contents)
 
-    if len(config.sections()) > 1:
-        raise ValueError("Config should only have one (fake) section")
+    items = {}
+    for section in config.sections():
+        items.update(dict(config[section].items()))
 
-    return dict(config[_FAKE_SECTION_NAME].items())
+    return items
 
 
 def _shell_to_ini(shell_file_contents: List[str]) -> List[str]:
