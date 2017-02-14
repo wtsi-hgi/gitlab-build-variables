@@ -24,19 +24,19 @@ def _parse_args(args: List[str]) -> _SetArgumentsRunConfig:
     """
     parser = argparse.ArgumentParser(
         prog="gitlab-set-variables", description="Tool for setting a GitLab project's build variables")
+    add_common_arguments(parser)
     parser.add_argument("source", type=str, help="File to source build variables from. Can be a ini file or a shell "
                                                  "script containing 'export' statements")
-    add_common_arguments(parser)
 
     arguments = parser.parse_args(args)
     return _SetArgumentsRunConfig(arguments.source, arguments.project, arguments.url, arguments.token)
 
 
-def main(run_config: _SetArgumentsRunConfig):
+def main():
     """
     Main method.
-    :param run_config: the run configuration
     """
+    run_config = _parse_args(sys.argv[1:])
     manager = ProjectBuildVariablesManager(run_config.url, run_config.token, run_config.project)
     variables = read_variables(run_config.source)
     manager.set_variables(variables)
@@ -44,5 +44,4 @@ def main(run_config: _SetArgumentsRunConfig):
 
 
 if __name__ == "__main__":
-    config = _parse_args(sys.argv[1:])
-    main(config)
+    main()

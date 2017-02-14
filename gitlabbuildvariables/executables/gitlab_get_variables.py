@@ -5,7 +5,6 @@ from typing import List
 
 from gitlabbuildvariables.executables._common import RunConfig, add_common_arguments
 from gitlabbuildvariables.manager import ProjectBuildVariablesManager
-from gitlabbuildvariables.reader import read_variables
 
 
 def _parse_args(args: List[str]) -> RunConfig:
@@ -21,15 +20,14 @@ def _parse_args(args: List[str]) -> RunConfig:
     return RunConfig(arguments.url, arguments.token, arguments.project)
 
 
-def main(run_config: RunConfig):
+def main():
     """
     Main method.
-    :param run_config: the run configuration
     """
+    run_config = _parse_args(sys.argv[1:])
     manager = ProjectBuildVariablesManager(run_config.url, run_config.token, run_config.project)
     pprint(manager.get_variables())
 
 
 if __name__ == "__main__":
-    config = _parse_args(sys.argv[1:])
-    main(config)
+    main(sys.argv[1:])

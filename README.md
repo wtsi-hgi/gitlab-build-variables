@@ -1,5 +1,5 @@
 # GitLab Build Variables
-_Helper for dealing with GitLab CI build variables._
+_Tools for dealing with GitLab CI build variables._
 
 
 ## Tools
@@ -7,7 +7,7 @@ _Helper for dealing with GitLab CI build variables._
 This tool allows a GitLab CI project's build variables to be set from a ini config file (or from a shell script that 
 just exports variables):
 ```bash
-gitlab-set-variables --url ${gitlab_url} --token ${access_token} ${location_of_variables} ${project}
+gitlab-set-variables --url ${gitlab_url} --token ${access_token} ${project} ${location_of_variables}
 ```
 
 ### Getting GitLab Build Variables
@@ -27,7 +27,7 @@ VALUE_3=ghi
 $ gitlab-get-variables --url ${gitlab_url} --token ${access_token} my-project
 {'VALUE_1': 'other'}
 
-$ gitlab-set-variables --url ${gitlab_url} --token ${access_token} my-variables.ini my-project
+$ gitlab-set-variables --url ${gitlab_url} --token ${access_token} my-variables.ini group/my-project
 Variables for project "my-project" set to: {'VALUE_1': 'abc', 'VALUE_2': 'def', 'VALUE_3': 'ghi'}
 ```
 
@@ -39,9 +39,9 @@ export VALUE_1=abc
 export VALUE_2=def
 export VALUE_3=ghi
 
-$ gitlab-get-variables --url ${gitlab_url} --token ${access_token} my-project
+$ gitlab-get-variables --url ${gitlab_url} --token ${access_token} group/my-project
 {'VALUE_1': 'other'}
 
-$ gitlab-set-variables --url ${gitlab_url} --token ${access_token} my-variables.ini my-project
+$ gitlab-set-variables --url ${gitlab_url} --token ${access_token} my-project my-variables.ini 
 Variables for project "my-project" set to: {'VALUE_1': 'abc', 'VALUE_2': 'def', 'VALUE_3': 'ghi'}
 ```
