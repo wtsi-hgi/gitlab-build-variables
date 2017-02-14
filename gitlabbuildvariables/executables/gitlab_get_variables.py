@@ -1,4 +1,5 @@
 import argparse
+import json
 import sys
 from pprint import pprint
 from typing import List
@@ -26,8 +27,9 @@ def main():
     """
     run_config = _parse_args(sys.argv[1:])
     manager = ProjectBuildVariablesManager(run_config.url, run_config.token, run_config.project)
-    pprint(manager.get_variables())
+    output = json.dumps(manager.get_variables(), sort_keys=True, indent=4, separators=(",", ": "))
+    print(output)
 
 
 if __name__ == "__main__":
-    main(sys.argv[1:])
+    main()
