@@ -32,6 +32,7 @@ def _read_ini_config(ini_file_contents: str) -> Dict[str, str]:
     :return: dictionary where the variable names are key and their values are the values
     """
     config = configparser.ConfigParser()
+    config.optionxform = str
     config.read_string(_FAKE_SECTION + ini_file_contents)
 
     items = {}
