@@ -51,4 +51,3 @@ def _shell_to_ini(shell_file_contents: List[str]) -> List[str]:
                 shell_file_contents[line_number] = line.replace(_EXPORT_COMMAND, "").strip()
             line_number += 1
     return shell_file_contents
-

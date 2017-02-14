@@ -2,19 +2,18 @@ import argparse
 import sys
 from typing import List
 
-from variablemanagement.manager import ProjectBuildVariablesManager
-from variablemanagement.reader import read_variables
+from gitlabbuildvariables.executables._common import add_common_arguments, RunConfig
+from gitlabbuildvariables.manager import ProjectBuildVariablesManager
+from gitlabbuildvariables.reader import read_variables
 
 
-class _SetArgumentsRunConfig:
+class _SetArgumentsRunConfig(RunConfig):
     """
     Run configuration for setting arguments.
     """
     def __init__(self, source: str, project: str, url: str, token: str):
+        super().__init__(url, token, project)
         self.source = source
-        self.project = project
-        self.url = url
-        self.token = token
 
 
 def _parse_args(args: List[str]) -> _SetArgumentsRunConfig:
@@ -25,12 +24,9 @@ def _parse_args(args: List[str]) -> _SetArgumentsRunConfig:
     """
     parser = argparse.ArgumentParser(
         prog="gitlab-set-variables", description="Tool for setting a GitLab project's build variables")
-    parser.add_argument("source", type=str,
-                        help="File to source build variables from. Can be a ini file or a shell script containing "
-                             "'export' statements")
-    parser.add_argument("project", type=str, help="The GitLab project to set the build variables for")
-    parser.add_argument("--url", type=str, help="Location of GitLab")
-    parser.add_argument("--token", type=str, help="GitLab access token")
+    parser.add_argument("source", type=str, help="File to source build variables from. Can be a ini file or a shell "
+                                                 "script containing 'export' statements")
+    add_common_arguments(parser)
 
     arguments = parser.parse_args(args)
     return _SetArgumentsRunConfig(arguments.source, arguments.project, arguments.url, arguments.token)

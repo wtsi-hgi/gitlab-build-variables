@@ -1,4 +1,3 @@
-from pprint import pprint
 from typing import Dict
 
 from gitlab import Gitlab, GitlabGetError
@@ -36,8 +35,9 @@ class ProjectBuildVariablesManager:
             self._project = self._connector.projects.get(project)
         except GitlabGetError as e:
             if "Project Not Found" in e.error_message:
-                raise ValueError("Project not found. Valid projects are: %s"
-                                 % [project.path_with_namespace for project in self._connector.projects.list()])
+                raise ValueError("Project '%s' not found. Valid projects are: %s"
+                                 % (project,
+                                    [project.path_with_namespace for project in self._connector.projects.list()]))
 
     def get_variables(self) -> Dict[str, str]:
         """
