@@ -1,7 +1,7 @@
 import json
 import os
 from abc import ABCMeta, abstractmethod
-from typing import List, Dict, Set
+from typing import List, Dict, Set, Tuple, Iterable
 
 import logging
 
@@ -33,6 +33,13 @@ class VariablesUpdater(metaclass=ABCMeta):
         Updates the appropriate GitLab CI build variables.
         """
 
+    @abstractmethod
+    def update_required(self) -> bool:
+        """
+        TODO
+        :return:
+        """
+
 
 class ProjectVariablesUpdater(VariablesUpdater):
     """
@@ -50,14 +57,24 @@ class ProjectVariablesUpdater(VariablesUpdater):
         self._variables_manager = ProjectVariablesManager(self.gitlab_config, project)
 
     def update(self):
+        variables = self._get_required_variables()
+        self._variables_manager.set_variables(variables)
+        _logger.info("Set variables for \"%s\": %s" % (self.project, variables))
+
+    def update_required(self) -> bool:
+        return self._variables_manager.get_variables() == self._get_required_variables()
+
+    def _get_required_variables(self) -> Dict[str, str]:
+        """
+        Gets the variables that are required for this project.
+        :return: the required variables
+        """
         variables = {}  # type: Dict[str, str]
         for setting_source_identifier in self.setting_sources:
             setting_location = self._resolve_setting_location(setting_source_identifier)
             setting_variables = read_variables(setting_location)
             variables.update(setting_variables)
-
-        self._variables_manager.set_variables(variables)
-        _logger.info("Set variables for \"%s\": %s" % (self.project, variables))
+        return variables
 
     def _resolve_setting_location(self, identifier: str) -> str:
         """
@@ -97,15 +114,32 @@ class ProjectsVariablesUpdater(VariablesUpdater):
         self.config_location = config_location
 
     def update(self):
-        with open(self.config_location, "r") as config_file:
-            config = config_file.read()
-        config = json.loads(config)
-        _logger.info("Read config from \"%s\"" % self.config_location)
-        _logger.debug("Config: %s" % config)
-
-        for project, settings_sources in config.items():
+        for project, settings_sources in self._get_projects_and_setting_sources():
             project_updater = ProjectVariablesUpdater(
                 project, set(settings_sources), gitlab_config=self.gitlab_config,
                 setting_repositories=self.setting_repositories,
                 default_setting_extensions=self.default_setting_extensions)
             project_updater.update()
+
+    def update_required(self) -> bool:
+        for project, settings_sources in self._get_projects_and_setting_sources():
+            project_updater = ProjectVariablesUpdater(
+                project, set(settings_sources), gitlab_config=self.gitlab_config,
+                setting_repositories=self.setting_repositories,
+                default_setting_extensions=self.default_setting_extensions)
+            if project_updater.update_required():
+                return True
+        return False
+
+    def _get_projects_and_setting_sources(self) -> Iterable[Tuple[str, List[str]]]:
+        """
+        Gets projects and their associated setting sources.
+        :return: iterable of tuples where the first item is the project identifier and the second is a list of their
+        variables sources
+        """
+        with open(self.config_location, "r") as config_file:
+            config = config_file.read()
+        config = json.loads(config)
+        _logger.info("Read config from \"%s\"" % self.config_location)
+        _logger.debug("Config: %s" % config)
+        return config.items()
