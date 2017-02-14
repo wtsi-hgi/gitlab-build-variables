@@ -5,12 +5,12 @@ _Tools for dealing with GitLab CI build variables._
 ## Tools
 ### Managing Multiple Projects
 ### Updating GitLab Build Variables
-With a
-- Projects configuration file.
-- Collection of files containing variable settings.
+Sets project build variables based on a configuration file:
 ```bash
-gitlab-update-variables --url ${gitlab_url} --token ${access_token} ${project} ${location_of_variables}
+gitlab-update-variables --url ${gitlab_url} --token ${access_token} --default-setting-extension ${extensions} \
+    --setting-repository ${repositoryDirectories} ${configLocation}
 ```
+_[See Example 1](#example-1) for a more intuitive example of how to use this tool!_
 
 ### Managing a Single Project
 #### Setting a GitLab Build Variables
@@ -28,18 +28,7 @@ gitlab-get-variables --url ${gitlab_url} --token ${access_token} ${project}
 
 ## Examples
 ### Example 1
-Using the settings defined in [the example directory](examples/settings) to update a project's variables:
-```bash
-$ gitlab-get-variables --url ${gitlab_url} --token ${access_token} my-project
-{'VALUE_1': 'other'}
-
-$ gitlab-set-variables --url ${gitlab_url} --token ${access_token} group/my-project common.json group.sh project.ini  
-Variables for project "my-project" set to: {'VALUE_1': 'abc', 'VALUE_2': 'def', 'VALUE_3': 'ghi'}
-```
-
-### Example 2
-Using the configuration defined in [the example directory](examples/config.json) to update the variables for a number 
-of projects:
+Using the [example configuration](examples/config.json) to update the variables for a number of projects:
 ```bash
 $ gitlab-get-variables --url ${gitlab_url} --token ${access_token} cn13/my-project-1
 {'VALUE_1': 'other'}
@@ -54,4 +43,12 @@ Set variables for "cn13/my-project-1": {'VALUE_1': 'abc', 'VALUE_2': 'other', 'V
 Set variables for "cn13/my-project-2": {'VALUE_1': 'abc', 'VALUE_2': 'other', 'VALUE_3': 'ghi'}
 ```
 
+### Example 2
+Using the settings defined in [the example directory](examples/settings) to update a project's variables:
+```bash
+$ gitlab-get-variables --url ${gitlab_url} --token ${access_token} my-project
+{'VALUE_1': 'other'}
 
+$ gitlab-set-variables --url ${gitlab_url} --token ${access_token} group/my-project common.json group.sh project.ini  
+Variables for project "my-project" set to: {'VALUE_1': 'abc', 'VALUE_2': 'def', 'VALUE_3': 'ghi'}
+```
