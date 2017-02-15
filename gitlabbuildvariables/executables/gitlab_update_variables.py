@@ -5,7 +5,7 @@ from typing import List
 
 from gitlabbuildvariables.common import GitLabConfig
 from gitlabbuildvariables.executables._common import add_common_arguments, RunConfig
-from gitlabbuildvariables.updater import ProjectsVariablesUpdater, _logger
+from gitlabbuildvariables.updaters import ProjectsVariablesUpdater, _logger, FileBasedProjectVariablesUpdaterBuilder
 
 
 class _UpdateArgumentsRunConfig(RunConfig):
@@ -36,9 +36,9 @@ def _parse_args(args: List[str]) -> _UpdateArgumentsRunConfig:
                         help="Extensions to try adding to the variable to source location if it does not exist")
 
     arguments = parser.parse_args(args)
-    return _UpdateArgumentsRunConfig(arguments.config_location, arguments.setting_repository,
-                                     arguments.default_setting_extensions, url=arguments.url, token=arguments.token,
-                                     debug=arguments.debug)
+    return _UpdateArgumentsRunConfig(
+        arguments.config_location, arguments.setting_repository, arguments.default_setting_extensions,
+        url=arguments.url, token=arguments.token, debug=arguments.debug)
 
 
 def main():
@@ -52,9 +52,12 @@ def main():
         _logger.setLevel(logging.INFO)
     gitlab_config = GitLabConfig(run_config.url, run_config.token)
 
-    updater = ProjectsVariablesUpdater(run_config.config_location, gitlab_config=gitlab_config,
-                                       setting_repositories=run_config.setting_repositories,
-                                       default_setting_extensions=run_config.default_setting_extensions)
+    project_updater_builder = FileBasedProjectVariablesUpdaterBuilder(
+        setting_repositories=run_config.setting_repositories,
+        default_setting_extensions=run_config.default_setting_extensions)
+
+    updater = ProjectsVariablesUpdater(config_location=run_config.config_location, gitlab_config=gitlab_config,
+                                       project_variables_updater_builder=project_updater_builder)
     updater.update()
 
 
