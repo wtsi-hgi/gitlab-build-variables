@@ -31,7 +31,7 @@ def _parse_args(args: List[str]) -> _UpdateArgumentsRunConfig:
     add_common_arguments(parser)
     parser.add_argument("config_location", type=str, help="Location of the configuration file")
     parser.add_argument("--setting-repository", dest="setting_repository", nargs="+", type=str,
-                        help="Directory from which variable sources may be sourced")
+                        help="Directory from which variable settings groups may be sourced")
     parser.add_argument("--default-setting-extension", dest="default_setting_extensions",nargs="+", type=str,
                         help="Extensions to try adding to the variable to source location if it does not exist")
 

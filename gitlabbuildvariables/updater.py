@@ -45,15 +45,16 @@ class ProjectVariablesUpdater(VariablesUpdater):
     """
     Updates variables for a project in GitLab CI.
     """
-    def __init__(self, project: str, setting_sources: Set[str], *args, **kwargs):
+    def __init__(self, project: str, setting_groups: Set[str], *args, **kwargs):
         """
         Constructor.
         :param project: name or ID of the project to update variables for
-        :param setting_sources: locations of variable settings that are to be sourced (lowest preference first)
+        :param setting_groups: locations of groups of settings variables that are to be sourced (lowest preference
+        first)
         """
         super().__init__(*args, **kwargs)
         self.project = project
-        self.setting_sources = setting_sources
+        self.setting_groups = setting_groups
         self._variables_manager = ProjectVariablesManager(self.gitlab_config, project)
 
     def update(self):
@@ -70,8 +71,8 @@ class ProjectVariablesUpdater(VariablesUpdater):
         :return: the required variables
         """
         variables = {}  # type: Dict[str, str]
-        for setting_source_identifier in self.setting_sources:
-            setting_location = self._resolve_setting_location(setting_source_identifier)
+        for group_identifier in self.setting_groups:
+            setting_location = self._resolve_setting_location(group_identifier)
             setting_variables = read_variables(setting_location)
             variables.update(setting_variables)
         return variables
@@ -108,34 +109,34 @@ class ProjectsVariablesUpdater(VariablesUpdater):
     def __init__(self, config_location: str, *args, **kwargs):
         """
         Constructor.
-        :param config_location: the location of the config file for setting project variables from variable sources
+        :param config_location: the location of the config file for setting project variables from settings groups
         """
         super().__init__(*args, **kwargs)
         self.config_location = config_location
 
     def update(self):
-        for project, settings_sources in self._get_projects_and_setting_sources():
+        for project, settings_group in self._get_projects_and_settings_groups():
             project_updater = ProjectVariablesUpdater(
-                project, set(settings_sources), gitlab_config=self.gitlab_config,
+                project, set(settings_group), gitlab_config=self.gitlab_config,
                 setting_repositories=self.setting_repositories,
                 default_setting_extensions=self.default_setting_extensions)
             project_updater.update()
 
     def update_required(self) -> bool:
-        for project, settings_sources in self._get_projects_and_setting_sources():
+        for project, settings_group in self._get_projects_and_settings_groups():
             project_updater = ProjectVariablesUpdater(
-                project, set(settings_sources), gitlab_config=self.gitlab_config,
+                project, set(settings_group), gitlab_config=self.gitlab_config,
                 setting_repositories=self.setting_repositories,
                 default_setting_extensions=self.default_setting_extensions)
             if project_updater.update_required():
                 return True
         return False
 
-    def _get_projects_and_setting_sources(self) -> Iterable[Tuple[str, List[str]]]:
+    def _get_projects_and_settings_groups(self) -> Iterable[Tuple[str, List[str]]]:
         """
-        Gets projects and their associated setting sources.
+        Gets projects and their associated settings groups.
         :return: iterable of tuples where the first item is the project identifier and the second is a list of their
-        variables sources
+        settings groups
         """
         with open(self.config_location, "r") as config_file:
             config = config_file.read()
