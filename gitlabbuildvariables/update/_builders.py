@@ -2,7 +2,7 @@ from abc import ABCMeta, abstractmethod
 from typing import TypeVar, Generic, Iterable, List, Dict
 
 from gitlabbuildvariables.common import GitLabConfig
-from gitlabbuildvariables.update.single_project_updaters import ProjectVariablesUpdater, \
+from gitlabbuildvariables.update._single_project_updaters import ProjectVariablesUpdater, \
     FileBasedProjectVariablesUpdater, DictBasedProjectVariablesUpdater
 
 ProjectVariablesUpdaterType = TypeVar("ProjectVariablesUpdater", bound=ProjectVariablesUpdater)

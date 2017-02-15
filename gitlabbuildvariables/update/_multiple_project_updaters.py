@@ -2,9 +2,9 @@ import json
 from typing import Iterable, Tuple
 
 from gitlabbuildvariables.common import GitLabConfig
-from gitlabbuildvariables.update.builders import ProjectVariablesUpdaterBuilder
-from gitlabbuildvariables.update.single_project_updaters import logger
-from gitlabbuildvariables.update.common import VariablesUpdater
+from gitlabbuildvariables.update._builders import ProjectVariablesUpdaterBuilder
+from gitlabbuildvariables.update._single_project_updaters import logger
+from gitlabbuildvariables.update._common import VariablesUpdater
 
 
 class ProjectsVariablesUpdater(VariablesUpdater):

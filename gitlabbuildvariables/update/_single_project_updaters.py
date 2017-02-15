@@ -5,7 +5,7 @@ from typing import List, Dict, Iterable
 
 from gitlabbuildvariables.manager import ProjectVariablesManager
 from gitlabbuildvariables.reader import read_variables
-from gitlabbuildvariables.update.common import VariablesUpdater
+from gitlabbuildvariables.update._common import VariablesUpdater
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.StreamHandler())

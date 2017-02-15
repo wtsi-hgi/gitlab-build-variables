@@ -1,6 +1,6 @@
-from gitlabbuildvariables.update.builders import DictBasedProjectVariablesUpdaterBuilder,\
+from gitlabbuildvariables.update._builders import DictBasedProjectVariablesUpdaterBuilder,\
     FileBasedProjectVariablesUpdaterBuilder, ProjectVariablesUpdaterBuilder, ProjectVariablesUpdaterType
-from gitlabbuildvariables.update.multiple_project_updaters import ProjectsVariablesUpdater
-from gitlabbuildvariables.update.single_project_updaters import ProjectVariablesUpdater, logger, \
+from gitlabbuildvariables.update._multiple_project_updaters import ProjectsVariablesUpdater
+from gitlabbuildvariables.update._single_project_updaters import ProjectVariablesUpdater, logger, \
     DictBasedProjectVariablesUpdater, FileBasedProjectVariablesUpdater
-from gitlabbuildvariables.update.common import VariablesUpdater
+from gitlabbuildvariables.update._common import VariablesUpdater
