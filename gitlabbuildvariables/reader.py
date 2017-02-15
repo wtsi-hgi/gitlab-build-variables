@@ -18,7 +18,8 @@ def read_variables(config_location: str) -> Dict[str, str]:
     with open(config_location, "r") as config_file:
         config_lines = config_file.readlines()
     try:
-        return json.loads("".join(config_lines))
+        return json.loads("".join(config_lines), parse_int=lambda num_str: str(num_str),
+                          parse_float=lambda float_str: str(float_str))
     except JSONDecodeError:
         pass
     config_lines = _shell_to_ini(config_lines)
