@@ -49,6 +49,6 @@ Using the settings defined in [the example directory](examples/settings) to upda
 $ gitlab-get-variables --url ${gitlab_url} --token ${access_token} my-project
 {'VALUE_1': 'other'}
 
-$ gitlab-set-variables --url ${gitlab_url} --token ${access_token} group/my-project common.json group.sh project.ini  
+$ gitlab-set-variables --url ${gitlab_url} --token ${access_token} group/my-project common.json s3.sh project.ini  
 Variables for project "my-project" set to: {'VALUE_1': 'abc', 'VALUE_2': 'def', 'VALUE_3': 'ghi'}
 ```
