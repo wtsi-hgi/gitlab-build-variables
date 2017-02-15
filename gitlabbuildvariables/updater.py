@@ -63,7 +63,7 @@ class ProjectVariablesUpdater(VariablesUpdater):
         _logger.info("Set variables for \"%s\": %s" % (self.project, variables))
 
     def update_required(self) -> bool:
-        return self._variables_manager.get_variables() == self._get_required_variables()
+        return self._variables_manager.get_variables() != self._get_required_variables()
 
     def _get_required_variables(self) -> Dict[str, str]:
         """
