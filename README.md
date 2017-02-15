@@ -7,7 +7,7 @@ _Tools for dealing with GitLab CI build variables._
 ### Updating GitLab Build Variables
 Sets project build variables based on a configuration file:
 ```bash
-gitlab-update-variables --url ${gitlab_url} --token ${access_token} --default-setting-extension ${extensions} \
+gitlab-update-variables --url ${gitlabUrl} --token ${accessToken} --default-setting-extension ${extensions} \
     --setting-repository ${repositoryDirectories} ${configLocation}
 ```
 _[See Example 1](#example-1) for a more intuitive example of how to use this tool!_
@@ -17,12 +17,12 @@ _[See Example 1](#example-1) for a more intuitive example of how to use this too
 This tool allows a GitLab CI project's build variables to be set from a ini config file, a JSON file or a shell script 
 that just exports variables:
 ```bash
-gitlab-set-variables --url ${gitlab_url} --token ${access_token} ${project} ${location_of_variables}
+gitlab-set-variables --url ${gitlabUrl} --token ${accessToken} ${project} ${locationOfVariables}
 ```
 
 #### Getting GitLab Build Variables
 ```bash
-gitlab-get-variables --url ${gitlab_url} --token ${access_token} ${project}
+gitlab-get-variables --url ${gitlabUrl} --token ${accessToken} ${project}
 ```
 
 
@@ -30,13 +30,16 @@ gitlab-get-variables --url ${gitlab_url} --token ${access_token} ${project}
 ### Example 1
 Using the [example configuration](examples/config.json) to update the variables for a number of projects:
 ```bash
-$ gitlab-get-variables --url ${gitlab_url} --token ${access_token} cn13/my-project-1
+$ export gitlabUrl=https://gitlab.example.com 
+$ export accessToken=personalAccessToken
+
+$ gitlab-get-variables --url ${gitlabUrl} --token ${accessToken} cn13/my-project-1
 {'VALUE_1': 'other'}
 
-$ gitlab-get-variables --url ${gitlab_url} --token ${access_token} cn13/my-project-2
+$ gitlab-get-variables --url ${gitlabUrl} --token ${accessToken} cn13/my-project-2
 {}
 
-$ gitlab-update-variables --url ${gitlab_url} --token ${access_token} --default-setting-extension json ini sh \
+$ gitlab-update-variables --url ${gitlabUrl} --token ${accessToken} --default-setting-extension json ini sh \
     --setting-repository examples/settings examples/config.json
 Read config from "examples/config.json"
 Set variables for "cn13/my-project-1": {'VALUE_1': 'abc', 'VALUE_2': 'other', 'VALUE_3': 'other'}
@@ -46,9 +49,12 @@ Set variables for "cn13/my-project-2": {'VALUE_1': 'abc', 'VALUE_2': 'other', 'V
 ### Example 2
 Using the settings defined in [the example directory](examples/settings) to update a project's variables:
 ```bash
-$ gitlab-get-variables --url ${gitlab_url} --token ${access_token} my-project
+$ export gitlabUrl=https://gitlab.internal.example.com 
+$ export accessToken=applicationAccessToken
+
+$ gitlab-get-variables --url ${gitlabUrl} --token ${accessToken} my-project
 {'VALUE_1': 'other'}
 
-$ gitlab-set-variables --url ${gitlab_url} --token ${access_token} group/my-project common.json s3.sh project.ini  
+$ gitlab-set-variables --url ${gitlabUrl} --token ${accessToken} group/my-project common.json s3.sh project.ini  
 Variables for project "my-project" set to: {'VALUE_1': 'abc', 'VALUE_2': 'def', 'VALUE_3': 'ghi'}
 ```
