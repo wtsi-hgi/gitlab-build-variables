@@ -115,4 +115,4 @@ class DictBasedProjectVariablesUpdater(ProjectVariablesUpdater):
         self.settings = settings
 
     def _read_group_variables(self, group: str) -> Dict[str, str]:
-        return self.settings[self.project]
+        return self.settings[group]
