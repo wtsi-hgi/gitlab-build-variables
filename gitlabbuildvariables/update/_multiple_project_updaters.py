@@ -1,6 +1,6 @@
 import json
 from abc import ABCMeta, abstractmethod
-from typing import Iterable, Tuple
+from typing import Iterable, Tuple, Dict
 
 from gitlabbuildvariables.common import GitLabConfig
 from gitlabbuildvariables.update._builders import ProjectVariablesUpdaterBuilder
@@ -53,8 +53,8 @@ class FileBasedProjectsVariablesUpdater(ProjectsVariablesUpdater):
         """
         Constructor.
         :param config_location: the location of the config file for setting project variables from settings groups
-        :param project_variables_updater_builder: builder for project variables updaters
-        :param gitlab_config: the configuration required to access GitLab
+        :param project_variables_updater_builder: see `ProjectsVariablesUpdater.__init__`
+        :param gitlab_config: see `ProjectsVariablesUpdater.__init__`
         """
         super().__init__(project_variables_updater_builder, gitlab_config)
         self.config_location = config_location
@@ -66,3 +66,22 @@ class FileBasedProjectsVariablesUpdater(ProjectsVariablesUpdater):
         logger.info("Read config from \"%s\"" % self.config_location)
         logger.debug("Config: %s" % config)
         return config.items()
+
+
+class DictBasedProjectsVariablesUpdater(ProjectsVariablesUpdater):
+    """
+    Updates variables for projects in GitLab CI, as defined by a configuration Python dictionary.
+    """
+    def __init__(self, configuration: Dict[str, Dict[str, str]],
+                 project_variables_updater_builder: ProjectVariablesUpdaterBuilder, gitlab_config: GitLabConfig):
+        """
+        Constructor.
+        :param configuration: project variables configuration
+        :param project_variables_updater_builder: see `ProjectsVariablesUpdater.__init__`
+        :param gitlab_config: see `ProjectsVariablesUpdater.__init__`
+        """
+        super().__init__(project_variables_updater_builder, gitlab_config)
+        self.configuration = configuration
+
+    def _get_projects_and_settings_groups(self) -> Iterable[Tuple[str, Iterable[str]]]:
+        return self.configuration.items()
