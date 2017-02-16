@@ -5,7 +5,7 @@ from typing import List
 
 from gitlabbuildvariables.common import GitLabConfig
 from gitlabbuildvariables.executables._common import add_common_arguments, RunConfig
-from gitlabbuildvariables.update import logger, FileBasedProjectVariablesUpdaterBuilder, ProjectsVariablesUpdater
+from gitlabbuildvariables.update import logger, FileBasedProjectVariablesUpdaterBuilder, FileBasedProjectsVariablesUpdater
 
 
 
@@ -57,8 +57,8 @@ def main():
         setting_repositories=run_config.setting_repositories,
         default_setting_extensions=run_config.default_setting_extensions)
 
-    updater = ProjectsVariablesUpdater(config_location=run_config.config_location, gitlab_config=gitlab_config,
-                                       project_variables_updater_builder=project_updater_builder)
+    updater = FileBasedProjectsVariablesUpdater(config_location=run_config.config_location, gitlab_config=gitlab_config,
+                                                project_variables_updater_builder=project_updater_builder)
     updater.update()
 
 
