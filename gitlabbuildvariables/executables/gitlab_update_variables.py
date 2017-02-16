@@ -5,7 +5,8 @@ from typing import List
 
 from gitlabbuildvariables.common import GitLabConfig
 from gitlabbuildvariables.executables._common import add_common_arguments, RunConfig
-from gitlabbuildvariables.update import logger, FileBasedProjectVariablesUpdaterBuilder, FileBasedProjectsVariablesUpdater
+from gitlabbuildvariables.update import logger, FileBasedProjectVariablesUpdaterBuilder, \
+    FileBasedProjectsVariablesUpdater
 
 
 
