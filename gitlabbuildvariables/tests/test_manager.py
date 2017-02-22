@@ -62,13 +62,13 @@ class TestProjectVariablesManager(unittest.TestCase):
         _add_variables_to_project(EXAMPLE_VARIABLES_1, self.project)
         variables = {**EXAMPLE_VARIABLES_2, list(EXAMPLE_VARIABLES_1.keys())[0]: "this_value_should_not_be_set"}
         self.manager.add_variables(variables, overwrite=False)
-        self.assertEqual({**EXAMPLE_VARIABLES_2, **EXAMPLE_VARIABLES_1}, len(self.project.variables.list()))
+        self.assertEqual({**EXAMPLE_VARIABLES_2, **EXAMPLE_VARIABLES_1}, self.project.variables.list())
 
     def test_add_variables_with_overwrite(self):
         _add_variables_to_project(EXAMPLE_VARIABLES_1, self.project)
         variables = {**EXAMPLE_VARIABLES_2, list(EXAMPLE_VARIABLES_1.keys())[0]: "this_value_should_be_set"}
         self.manager.add_variables(variables, overwrite=True)
-        self.assertEqual({**EXAMPLE_VARIABLES_1, **EXAMPLE_VARIABLES_2}, len(self.project.variables.list()))
+        self.assertEqual({**EXAMPLE_VARIABLES_1, **EXAMPLE_VARIABLES_2}, self.project.variables.list())
 
 
 if __name__ == "__main__":
