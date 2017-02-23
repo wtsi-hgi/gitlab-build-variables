@@ -1,7 +1,7 @@
 import unittest
-from typing import Dict
+from typing import Dict, Iterable
 
-from gitlab import Gitlab, Project
+from gitlab import Gitlab, Project, ProjectVariable
 from useintest.predefined.gitlab import GitLab8_16_6_ce_0ServiceController
 
 from gitlabbuildvariables.common import GitLabConfig
@@ -20,6 +20,15 @@ def _add_variables_to_project(variables: Dict[str, str], project: Project):
     """
     for key, value in variables.items():
         project.variables.create({"key": key, "value": value})
+
+
+def _convert_projects_variables_to_dicts(project_variables: Iterable[ProjectVariable]) -> Dict[str, str]:
+    """
+    Converts the GitLab's library project variable models to a dictionary representation.
+    :param project_variables: the project variable models
+    :return: the dicitionary representation
+    """
+    return {variable.key: variable.value for variable in project_variables}
 
 
 class TestProjectVariablesManager(unittest.TestCase):
@@ -56,19 +65,22 @@ class TestProjectVariablesManager(unittest.TestCase):
     def test_set_variables(self):
         _add_variables_to_project(EXAMPLE_VARIABLES_1, self.project)
         self.manager.set_variables(EXAMPLE_VARIABLES_2)
-        self.assertEqual(EXAMPLE_VARIABLES_2, len(self.project.variables.list()))
+        self.assertEqual(EXAMPLE_VARIABLES_2,
+                         _convert_projects_variables_to_dicts(self.project.variables.list()))
 
     def test_add_variables_no_overwrite(self):
         _add_variables_to_project(EXAMPLE_VARIABLES_1, self.project)
         variables = {**EXAMPLE_VARIABLES_2, list(EXAMPLE_VARIABLES_1.keys())[0]: "this_value_should_not_be_set"}
         self.manager.add_variables(variables, overwrite=False)
-        self.assertEqual({**EXAMPLE_VARIABLES_2, **EXAMPLE_VARIABLES_1}, self.project.variables.list())
+        self.assertEqual({**EXAMPLE_VARIABLES_2, **EXAMPLE_VARIABLES_1},
+                         _convert_projects_variables_to_dicts(self.project.variables.list()))
 
     def test_add_variables_with_overwrite(self):
         _add_variables_to_project(EXAMPLE_VARIABLES_1, self.project)
         variables = {**EXAMPLE_VARIABLES_2, list(EXAMPLE_VARIABLES_1.keys())[0]: "this_value_should_be_set"}
         self.manager.add_variables(variables, overwrite=True)
-        self.assertEqual({**EXAMPLE_VARIABLES_1, **EXAMPLE_VARIABLES_2}, self.project.variables.list())
+        self.assertEqual({**EXAMPLE_VARIABLES_1, **variables},
+                         _convert_projects_variables_to_dicts(self.project.variables.list()))
 
 
 if __name__ == "__main__":
