@@ -45,14 +45,14 @@ class ProjectVariablesManager:
         Gets the build variables for the project.
         :return: the build variables
         """
-        variables = self._project.variables.list()
+        variables = self._project.variables.list(all=True)
         return {variable.key: variable.value for variable in variables}
 
     def clear_variables(self):
         """
         Clears all of the build variables.
         """
-        for variable in self._project.variables.list():
+        for variable in self._project.variables.list(all=True):
             variable.delete()
 
     def set_variables(self, variables: Dict[str, str]):
