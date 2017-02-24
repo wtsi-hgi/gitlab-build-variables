@@ -58,7 +58,7 @@ class TestProjectVariablesManager(unittest.TestCase):
         self.assertEqual(EXAMPLE_VARIABLES_1, self.manager.get_variables())
 
     def test_get_many_variables(self):
-        variables = {i: str(i) for i in range(100)}
+        variables = {str(i): str(i) for i in range(100)}
         _add_variables_to_project(variables, self.project)
         self.assertEqual(variables, self.manager.get_variables())
 
@@ -68,7 +68,7 @@ class TestProjectVariablesManager(unittest.TestCase):
         self.assertEqual(0, len(self.project.variables.list()))
 
     def test_clear_many_variables(self):
-        variables = {i: str(i) for i in range(100)}
+        variables = {str(i): str(i) for i in range(100)}
         _add_variables_to_project(variables, self.project)
         self.manager.clear_variables()
         self.assertEqual(0, len(self.project.variables.list()))
