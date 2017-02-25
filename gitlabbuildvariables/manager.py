@@ -1,6 +1,5 @@
-from typing import Dict
-
 from gitlab import Gitlab, GitlabGetError
+from typing import Dict
 
 from gitlabbuildvariables.common import GitLabConfig
 
@@ -54,6 +53,7 @@ class ProjectVariablesManager:
         """
         for variable in self._project.variables.list(all=True):
             variable.delete()
+        print(self.get_variables())
 
     def set_variables(self, variables: Dict[str, str]):
         """
