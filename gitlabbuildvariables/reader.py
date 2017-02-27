@@ -1,6 +1,7 @@
 import configparser
 import json
 from json import JSONDecodeError
+
 from typing import Dict, List
 
 _FAKE_SECTION_NAME = "all"
@@ -52,9 +53,10 @@ def _shell_to_ini(shell_file_contents: List[str]) -> List[str]:
     line_number = 0
     while line_number < len(shell_file_contents):
         line = shell_file_contents[line_number].strip()
-        if not line.strip().startswith(_EXPORT_COMMAND):
+        if "=" not in line:
             del shell_file_contents[line_number]
         else:
-            shell_file_contents[line_number] = line.replace(_EXPORT_COMMAND, "").strip()
+            if line.strip().startswith(_EXPORT_COMMAND):
+                shell_file_contents[line_number] = line.replace(_EXPORT_COMMAND, "").strip()
             line_number += 1
     return shell_file_contents
