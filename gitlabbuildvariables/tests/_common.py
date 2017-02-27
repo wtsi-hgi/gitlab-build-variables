@@ -1,7 +1,9 @@
 import unittest
-from abc import ABCMeta
+import uuid
+from abc import ABCMeta, abstractmethod
 from threading import Lock
 
+import atexit
 from gitlab import Project, ProjectVariable, Gitlab
 from typing import Dict, Iterable
 from useintest.models import DockerisedServiceWithUsers
@@ -12,7 +14,6 @@ from gitlabbuildvariables.manager import ProjectVariablesManager
 
 _GITLAB_PORT = 80
 
-EXAMPLE_PROJECT_NAME = "my-project"
 EXAMPLE_VARIABLES_1 = {"thisKey": "thatValue", "otherKey": "otherValue"}
 EXAMPLE_VARIABLES_2 = {"a": "b", "c": "d"}
 
@@ -36,75 +37,22 @@ def convert_projects_variables_to_dicts(project_variables: Iterable[ProjectVaria
     return {variable.key: variable.value for variable in project_variables}
 
 
-class TestWithGitLabProject(unittest.TestCase, metaclass=ABCMeta):
+class _LazyService(metaclass=ABCMeta):
     """
-    Superclass for tests that require a GitLab project.
-
-    Lazily starts GitLab when required.
+    A service that starts opnly when asked to.
     """
-    @property
-    def gitlab_service(self) -> DockerisedServiceWithUsers:
-        self._start_if_not_started()
-        return self._gitlab_service
+    @abstractmethod
+    def _start(self):
+        """
+        Starts the service.
+        """
 
-    @property
-    def gitlab_location(self) -> str:
-        self._start_if_not_started()
-        return self._gitlab_location
-
-    @property
-    def gitlab(self) -> Gitlab:
-        self._start_if_not_started()
-        return self._gitlab
-
-    @property
-    def project(self) -> Project:
-        self._start_if_not_started()
-        return self._project
-
-    @property
-    def project_name(self) -> str:
-        self._start_if_not_started()
-        return self._project_name
-
-    @property
-    def manager(self) -> ProjectVariablesManager:
-        self._start_if_not_started()
-        return self._manager
-
-    def setUp(self):
-        self._gitlab_controller = GitLab8_16_6_ce_0ServiceController()
-        self._gitlab_service = None
-        self._gitlab_location = None
-        self._gitlab = None
-        self._project = None
-        self._project_name = None
-        self._manager = None
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self._start_lock = Lock()
         self._started = False
 
-    def tearDown(self):
-        if self._gitlab_service is not None:
-            self._gitlab_controller.stop_service(self._gitlab_service)
-
-    def _start(self):
-        """
-        Starts up GitLab and creates a project.
-        """
-        self._gitlab_service = self._gitlab_controller.start_service()
-
-        self._gitlab_location = f"http://{self._gitlab_service.host}:{self._gitlab_service.ports[_GITLAB_PORT]}"
-        self._gitlab = Gitlab(url=self._gitlab_location, email=self._gitlab_service.root_user.username,
-                             password=self._gitlab_service.root_user.password)
-        self._gitlab.auth()
-
-        self._project = self._gitlab.projects.create({"name": EXAMPLE_PROJECT_NAME})
-        self._project_name = f"{self._gitlab_service.root_user.username}/{EXAMPLE_PROJECT_NAME}"
-
-        gitlab_config = GitLabConfig(self._gitlab_location, self._gitlab.private_token)
-        self._manager = ProjectVariablesManager(gitlab_config, self._project_name)
-
-    def _start_if_not_started(self):
+    def start_if_not_started(self):
         """
         Starts up GitLab if not yet started.
         """
@@ -113,3 +61,91 @@ class TestWithGitLabProject(unittest.TestCase, metaclass=ABCMeta):
                 if not self._started:
                     self._start()
                     self._started = True
+
+
+class _GitLabService(_LazyService):
+    @property
+    def gitlab_location(self) -> str:
+        self.start_if_not_started()
+        return self._gitlab_location
+
+    @property
+    def gitlab(self) -> Gitlab:
+        self.start_if_not_started()
+        return self._gitlab
+
+    def __init__(self):
+        super().__init__()
+        self._gitlab_controller = GitLab8_16_6_ce_0ServiceController()
+        self._gitlab_service = None
+        self._gitlab_location = None
+        self._gitlab = None
+        atexit.register(self.tear_down)
+
+    def tear_down(self):
+        if self._gitlab is not None:
+            self._gitlab_controller.tear_down(self._gitlab_service)
+
+    def _start(self):
+        self._gitlab_service = self._gitlab_controller.start_service()
+        self._gitlab_location = f"http://{self._gitlab_service.host}:{self._gitlab_service.ports[_GITLAB_PORT]}"
+        self._gitlab = Gitlab(url=self._gitlab_location, email=self._gitlab_service.root_user.username,
+                             password=self._gitlab_service.root_user.password)
+        self._gitlab.auth()
+
+
+class TestWithGitLabProject(_LazyService, unittest.TestCase, metaclass=ABCMeta):
+    """
+    Superclass for tests that require a GitLab project.
+
+    Lazily starts GitLab when required.
+    """
+    _SHARED_GITLAB_SERVICE = _GitLabService()
+
+    @property
+    def gitlab(self) -> Gitlab:
+        self.start_if_not_started()
+        return self._gitlab_service.gitlab
+
+    @property
+    def gitlab_location(self) -> str:
+        self.start_if_not_started()
+        return self._gitlab_service.gitlab_location
+
+    @property
+    def project(self) -> Project:
+        self.start_if_not_started()
+        return self._project
+
+    @property
+    def project_name(self) -> str:
+        self.start_if_not_started()
+        return self._project_name
+
+    @property
+    def manager(self) -> ProjectVariablesManager:
+        self.start_if_not_started()
+        return self._manager
+
+    def setUp(self):
+        self._gitlab_service = TestWithGitLabProject._SHARED_GITLAB_SERVICE
+        self._project = None
+        self._project_name = None
+        self._manager = None
+
+    def tearDown(self):
+        if self._project is not None:
+            self.gitlab.projects.delete(self.project.id)
+
+    def _start(self):
+        """
+        Starts up GitLab and creates a project.
+        """
+        gitlab = self._gitlab_service.gitlab
+        project_name = str(uuid.uuid4())
+
+        self._project = gitlab.projects.create({"name": project_name})
+        self._project_name = f"{gitlab.user.username}/{project_name}"
+
+        gitlab_config = GitLabConfig(self._gitlab_service.gitlab_location, gitlab.private_token)
+        self._manager = ProjectVariablesManager(gitlab_config, self._project_name)
