@@ -15,7 +15,7 @@ class TestProjectVariablesManager(TestWithGitLabProject):
 
     def test_get_many_variables(self):
         variables = {str(i): str(i) for i in range(100)}
-        _add_variables_to_project(variables, self.project)
+        add_variables_to_project(variables, self.project)
         self.assertEqual(variables, self.manager.get_variables())
 
     def test_clear_variables(self):
@@ -25,7 +25,7 @@ class TestProjectVariablesManager(TestWithGitLabProject):
 
     def test_clear_many_variables(self):
         variables = {str(i): str(i) for i in range(100)}
-        _add_variables_to_project(variables, self.project)
+        add_variables_to_project(variables, self.project)
         self.manager.clear_variables()
         self.assertEqual(0, len(self.project.variables.list()))
 
