@@ -52,10 +52,9 @@ def _shell_to_ini(shell_file_contents: List[str]) -> List[str]:
     line_number = 0
     while line_number < len(shell_file_contents):
         line = shell_file_contents[line_number].strip()
-        if line.startswith("#") or line == "":
+        if not line.strip().startswith(_EXPORT_COMMAND):
             del shell_file_contents[line_number]
         else:
-            if line.startswith(_EXPORT_COMMAND):
-                shell_file_contents[line_number] = line.replace(_EXPORT_COMMAND, "").strip()
+            shell_file_contents[line_number] = line.replace(_EXPORT_COMMAND, "").strip()
             line_number += 1
     return shell_file_contents
