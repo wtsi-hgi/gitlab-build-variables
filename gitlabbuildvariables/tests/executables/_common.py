@@ -21,10 +21,8 @@ class TestExecutable(TestWithGitLabProject, metaclass=ABCMeta):
         Gets the path to the executable being tested.
         :return: path to the executable
         """
-
     def test_help(self):
         result = execute([self.executable, "-h"])
-        self.assertEqual("", result.stderr)
         self.assertEqual(0, result.exit_code)
         self.assertTrue(result.stdout.startswith("usage:"))
         print(result.stdout)
