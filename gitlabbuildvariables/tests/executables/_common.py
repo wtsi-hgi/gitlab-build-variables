@@ -21,6 +21,7 @@ class TestExecutable(TestWithGitLabProject, metaclass=ABCMeta):
         Gets the path to the executable being tested.
         :return: path to the executable
         """
+
     def test_help(self):
         result = execute([self.executable, "-h"])
         self.assertEqual(0, result.exit_code)
@@ -48,6 +49,7 @@ def execute(arguments: List[str]) -> ExecutionResult:
     :param arguments: arguments, where the first element should be the executable's name
     :return: the results
     """
+    os.environ["COVERAGE_PROCESS_START"] = ".coveragerc"    # See: http://coverage.readthedocs.io/en/coverage-4.2/subprocess.html#configuring-python-for-sub-process-coverage
     os.environ["PYTHONPROJECT"] = _ROOT_DIRECTORY
     completed_process = run(["python", *arguments], stdout=PIPE, stderr=PIPE)
     return ExecutionResult(completed_process.returncode, completed_process.stdout.decode(_ENCODING),

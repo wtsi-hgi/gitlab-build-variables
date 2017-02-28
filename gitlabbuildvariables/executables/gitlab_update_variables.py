@@ -9,7 +9,6 @@ from gitlabbuildvariables.update import logger, FileBasedProjectVariablesUpdater
     FileBasedProjectsVariablesUpdater
 
 
-
 class _UpdateArgumentsRunConfig(RunConfig):
     """
     Run configuration for setting arguments.
