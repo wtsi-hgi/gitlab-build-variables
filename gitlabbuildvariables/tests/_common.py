@@ -84,7 +84,7 @@ class _GitLabService(_LazyService):
 
     def tear_down(self):
         if self._gitlab is not None:
-            self._gitlab_controller.tear_down(self._gitlab_service)
+            self._gitlab_controller.stop_service(self._gitlab_service)
 
     def _start(self):
         self._gitlab_service = self._gitlab_controller.start_service()
