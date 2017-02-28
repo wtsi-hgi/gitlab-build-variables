@@ -48,6 +48,7 @@ def execute(arguments: List[str]) -> ExecutionResult:
     :param arguments: arguments, where the first element should be the executable's name
     :return: the results
     """
+    os.environ["COVERAGE_PROCESS_START"] = "1"    # See: http://coverage.readthedocs.io/en/coverage-4.2/subprocess.html#configuring-python-for-sub-process-coverage
     os.environ["PYTHONPROJECT"] = _ROOT_DIRECTORY
     completed_process = run(["python", *arguments], stdout=PIPE, stderr=PIPE)
     return ExecutionResult(completed_process.returncode, completed_process.stdout.decode(_ENCODING),
