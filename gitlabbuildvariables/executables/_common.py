@@ -1,8 +1,5 @@
 from argparse import ArgumentParser
 
-import logging
-from typing import Union
-
 
 class RunConfig:
     """
