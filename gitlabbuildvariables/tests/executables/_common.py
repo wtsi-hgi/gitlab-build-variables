@@ -12,7 +12,7 @@ _ENCODING = "UTF-8"
 
 class TestExecutable(TestWithGitLabProject, metaclass=ABCMeta):
     """
-    TODO
+    Base class for tests that use executables.
     """
     @property
     @abstractmethod
@@ -25,7 +25,6 @@ class TestExecutable(TestWithGitLabProject, metaclass=ABCMeta):
         result = execute([self.executable, "-h"])
         self.assertEqual(0, result.exit_code)
         self.assertTrue(result.stdout.startswith("usage:"))
-        print(result.stdout)
 
     def test_when_missing_credentials(self):
         result = execute([self.executable])

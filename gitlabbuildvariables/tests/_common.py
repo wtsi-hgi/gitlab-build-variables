@@ -1,12 +1,11 @@
+import atexit
 import unittest
 import uuid
 from abc import ABCMeta, abstractmethod
 from threading import Lock
 
-import atexit
 from gitlab import Project, ProjectVariable, Gitlab
 from typing import Dict, Iterable
-from useintest.models import DockerisedServiceWithUsers
 from useintest.predefined.gitlab import GitLab8_16_6_ce_0ServiceController
 
 from gitlabbuildvariables.common import GitLabConfig
