@@ -37,11 +37,11 @@ class ProjectVariablesUpdater(VariablesUpdater, metaclass=ABCMeta):
 
     def update(self):
         variables = self._get_variables()
-        self._variables_manager.set_variables(variables)
+        self._variables_manager.set(variables)
         logger.info("Set variables for \"%s\": %s" % (self.project, variables))
 
     def update_required(self) -> bool:
-        return self._variables_manager.get_variables() != self._get_variables()
+        return self._variables_manager.get() != self._get_variables()
 
     def _get_variables(self) -> Dict[str, str]:
         """

@@ -45,8 +45,8 @@ def main():
     variables = {}  # type: Dict[str, str]
     for source in run_config.source:
         variables.update(read_variables(source))
-    manager.set_variables(variables)
-    print("Variables for project \"%s\" set to: %s" % (run_config.project, manager.get_variables()))
+    manager.set(variables)
+    print("Variables for project \"%s\" set to: %s" % (run_config.project, manager.get()))
 
 
 if __name__ == "__main__":

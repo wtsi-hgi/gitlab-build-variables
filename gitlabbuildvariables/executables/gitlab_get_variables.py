@@ -28,7 +28,7 @@ def main():
     run_config = _parse_args(sys.argv[1:])
     gitlab_config = GitLabConfig(run_config.url, run_config.token)
     manager = ProjectVariablesManager(gitlab_config, run_config.project)
-    output = json.dumps(manager.get_variables(), sort_keys=True, indent=4, separators=(",", ": "))
+    output = json.dumps(manager.get(), sort_keys=True, indent=4, separators=(",", ": "))
     print(output)
 
 
