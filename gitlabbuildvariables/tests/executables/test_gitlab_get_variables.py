@@ -17,7 +17,7 @@ class TestGitLabGetVariablesExecutable(TestExecutable):
     def test_get(self):
         add_variables_to_project(EXAMPLE_VARIABLES_1, self.project)
         result = execute([self.executable, "--token", self.gitlab.private_token, "--url", self.gitlab_location,
-                          self.project_name])
+                          self.project.path_with_namespace])
         self.assertEqual(0, result.exit_code)
         self.assertEqual(EXAMPLE_VARIABLES_1, json.loads(result.stdout))
 

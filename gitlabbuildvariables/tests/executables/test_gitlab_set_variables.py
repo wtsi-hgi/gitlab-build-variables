@@ -20,7 +20,7 @@ class TestGitLabSetVariablesExecutable(TestExecutable):
             file.write(json.dumps(EXAMPLE_VARIABLES_1))
             file.flush()
             result = execute([self.executable, "--token", self.gitlab.private_token, "--url", self.gitlab_location,
-                              self.project_name, file.name])
+                              self.project.path_with_namespace, file.name])
         self.assertEqual(0, result.exit_code)
         self.assertEqual(EXAMPLE_VARIABLES_1, convert_projects_variables_to_dicts(self.project.variables.list()))
 
@@ -31,7 +31,7 @@ class TestGitLabSetVariablesExecutable(TestExecutable):
             file.write(exports)
             file.flush()
             result = execute([self.executable, "--token", self.gitlab.private_token, "--url", self.gitlab_location,
-                              self.project_name, file.name])
+                              self.project.path_with_namespace, file.name])
         self.assertEqual(0, result.exit_code)
         self.assertEqual(EXAMPLE_VARIABLES_1, convert_projects_variables_to_dicts(self.project.variables.list()))
 
@@ -41,7 +41,7 @@ class TestGitLabSetVariablesExecutable(TestExecutable):
             file.write(config)
             file.flush()
             result = execute([self.executable, "--token", self.gitlab.private_token, "--url", self.gitlab_location,
-                              self.project_name, file.name])
+                              self.project.path_with_namespace, file.name])
         self.assertEqual(0, result.exit_code)
         self.assertEqual(EXAMPLE_VARIABLES_1, convert_projects_variables_to_dicts(self.project.variables.list()))
 
