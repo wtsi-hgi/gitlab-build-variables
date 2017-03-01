@@ -8,7 +8,7 @@ _Tools for dealing with GitLab CI build variables._
 Sets project build variables based on a configuration file:
 ```bash
 gitlab-update-variables --url ${gitlabUrl} --token ${accessToken} --default-setting-extension ${extensions} \
-    --setting-repository ${repositoryDirectories} ${configLocation}
+    --setting-repository ${repositoryDirectories} -- ${configLocation}
 ```
 _[See Example 1](#example-1) for a more intuitive example of how to use this tool!_
 
@@ -40,7 +40,7 @@ $ gitlab-get-variables --url ${gitlabUrl} --token ${accessToken} cn13/my-project
 {}
 
 $ gitlab-update-variables --url ${gitlabUrl} --token ${accessToken} --default-setting-extension json ini sh \
-    --setting-repository examples/settings examples/config.json
+    --setting-repository examples/settings -- examples/config.json
 Read config from "examples/config.json"
 Set variables for "cn13/my-project-1": {'VALUE_1': 'abc', 'VALUE_2': 'other', 'VALUE_3': 'other'}
 Set variables for "cn13/my-project-2": {'VALUE_1': 'abc', 'VALUE_2': 'other', 'VALUE_3': 'ghi'}
