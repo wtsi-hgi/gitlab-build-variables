@@ -1,5 +1,6 @@
+from dictdiffer import DictDiffer
 from gitlab import Gitlab, GitlabGetError
-from typing import Dict
+from typing import Dict, Iterable, List, Union
 
 from gitlabbuildvariables.common import GitLabConfig
 
@@ -53,15 +54,34 @@ class ProjectVariablesManager:
         """
         for variable in self._project.variables.list(all=True):
             variable.delete()
-        print(self.get_variables())
+
+    def remove_variables(self, variables: Union[Iterable[str], Dict[str, str]]=None):
+        """
+        Removes the given variables. Will only remove a key if it has the given value if the value has been defined.
+        :param variables: the variables to remove
+        """
+        keys = list(variables.keys()) if isinstance(variables, Dict) else variables     # type: Iterable[str]
+        for key in keys:
+            variable = self._project.variables.get(key)
+            if isinstance(variables, Dict):
+                if variables[key] != variable.value:
+                    continue
+            variable.delete()
 
     def set_variables(self, variables: Dict[str, str]):
         """
-        Sets tje build variables (i.e. removes old ones, adds new ones)
+        Sets the build variables (i.e. removes old ones, adds new ones)
         :param variables: the build variables to set
         """
-        self.clear_variables()
-        self.add_variables(variables)
+        current_variables = self.get_variables()
+        difference = DictDiffer(variables, current_variables)
+
+        removed_keys = difference.removed()
+        self.remove_variables(removed_keys)
+
+        changed_keys = difference.added() | difference.changed()
+        changed = {key: variables[key] for key in changed_keys}
+        self.add_variables(changed, overwrite=True)
 
     def add_variables(self, variables: Dict[str, str], overwrite: bool=False):
         """
@@ -74,8 +94,8 @@ class ProjectVariablesManager:
 
         for key, value in variables.items():
             if key in preset_variable_keys:
-                variable = preset_variables[preset_variable_keys.index(key)]
                 if overwrite:
+                    variable = preset_variables[preset_variable_keys.index(key)]
                     variable.value = value
                     variable.save()
             else:
