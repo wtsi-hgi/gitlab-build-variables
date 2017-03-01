@@ -1,5 +1,12 @@
 try:
-    import coverage
-    coverage.process_startup()
+    import pydevd
+    DEBUGGING = True
 except ImportError:
-    pass
+    DEBUGGING = False
+
+if not DEBUGGING:
+    try:
+        import coverage
+        coverage.process_startup()
+    except ImportError:
+        pass
