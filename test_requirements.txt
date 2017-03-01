@@ -1,1 +1,2 @@
 git+https://github.com/wtsi-hgi/useintest.git@5216b00124abc60327f32989b57ca6aea9226c2d#egg=useintest
+hgicommon==1.3.0

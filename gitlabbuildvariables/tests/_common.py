@@ -5,7 +5,7 @@ from abc import ABCMeta, abstractmethod
 from threading import Lock
 
 from gitlab import Project, ProjectVariable, Gitlab
-from typing import Dict, Iterable
+from typing import Dict, Iterable, List
 from useintest.predefined.gitlab import GitLab8_16_6_ce_0ServiceController
 
 from gitlabbuildvariables.common import GitLabConfig
@@ -50,6 +50,7 @@ class _LazyService(metaclass=ABCMeta):
         super().__init__(*args, **kwargs)
         self._start_lock = Lock()
         self._started = False
+        self._starting = False
 
     def start_if_not_started(self):
         """
@@ -58,7 +59,9 @@ class _LazyService(metaclass=ABCMeta):
         if not self._started:
             with self._start_lock:
                 if not self._started:
+                    self._starting = True
                     self._start()
+                    self._starting = False
                     self._started = True
 
 
@@ -117,34 +120,40 @@ class TestWithGitLabProject(_LazyService, unittest.TestCase, metaclass=ABCMeta):
         return self._project
 
     @property
-    def project_name(self) -> str:
-        self.start_if_not_started()
-        return self._project_name
-
-    @property
     def manager(self) -> ProjectVariablesManager:
         self.start_if_not_started()
         return self._manager
 
     def setUp(self):
+        self._projects: List[Project] = []
         self._gitlab_service = TestWithGitLabProject._SHARED_GITLAB_SERVICE
         self._project = None
-        self._project_name = None
         self._manager = None
 
     def tearDown(self):
         if self._project is not None:
             self.gitlab.projects.delete(self.project.id)
 
+    def create_project(self, project_name: str=None) -> Project:
+        """
+        TODO
+        :param project_name: 
+        :param _starting: 
+        :return: 
+        """
+        if project_name is None:
+            project_name = str(uuid.uuid4())
+        gitlab = self.gitlab if not self._starting else self._gitlab_service.gitlab
+        project = gitlab.projects.create({"name": project_name})
+        self._projects.append(project)
+        return project
+
     def _start(self):
         """
         Starts up GitLab and creates a project.
         """
         gitlab = self._gitlab_service.gitlab
-        project_name = str(uuid.uuid4())
-
-        self._project = gitlab.projects.create({"name": project_name})
-        self._project_name = f"{gitlab.user.username}/{project_name}"
+        self._project = self.create_project()
 
         gitlab_config = GitLabConfig(self._gitlab_service.gitlab_location, gitlab.private_token)
-        self._manager = ProjectVariablesManager(gitlab_config, self._project_name)
+        self._manager = ProjectVariablesManager(gitlab_config, self._project.path_with_namespace)
