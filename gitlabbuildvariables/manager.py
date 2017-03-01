@@ -94,8 +94,8 @@ class ProjectVariablesManager:
 
         for key, value in variables.items():
             if key in preset_variable_keys:
-                variable = preset_variables[preset_variable_keys.index(key)]
                 if overwrite:
+                    variable = preset_variables[preset_variable_keys.index(key)]
                     variable.value = value
                     variable.save()
             else:
