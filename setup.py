@@ -10,10 +10,10 @@ except ImportError:
 
 setup(
     name="gitlabbuildvariables",
-    version="1.0.0",
+    version="1.1.0",
     packages=find_packages(exclude=["tests"]),
     install_requires=open("requirements.txt", "r").readlines(),
-    url="https://github.com/wtsi-hgi/gitlab-build-variables-manager",
+    url="https://github.com/wtsi-hgi/gitlab-build-variables",
     license="GPL3",
     description="Tools for dealing with GitLab CI build variables",
     long_description=read_markdown("README.md"),
@@ -23,5 +23,11 @@ setup(
             "gitlab-get-variables=gitlabbuildvariables.executables.gitlab_get_variables:main",
             "gitlab-update-variables=gitlabbuildvariables.executables.gitlab_update_variables:main"
         ]
-    }
+    },
+    classifiers=[
+        "Development Status :: 5 - Production/Stable",
+        "Operating System :: OS Independent",
+        "Programming Language :: Python :: 3.6",
+        "License :: OSI Approved :: GNU General Public License v3 (GPLv3)"
+    ]
 )
