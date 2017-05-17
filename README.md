@@ -1,5 +1,5 @@
-[![Build Status](https://travis-ci.org/wtsi-hgi/gitlab-build-variables-manager.svg)](https://travis-ci.org/wtsi-hgi/gitlab-build-variables-manager)
-[![codecov.io](https://codecov.io/gh/wtsi-hgi/gitlab-build-variables-manager/graph/badge.svg)](https://codecov.io/github/wtsi-hgi/gitlab-build-variables-manager)
+[![Build Status](https://travis-ci.org/wtsi-hgi/gitlab-build-variables.svg)](https://travis-ci.org/wtsi-hgi/gitlab-build-variables)
+[![codecov.io](https://codecov.io/gh/wtsi-hgi/gitlab-build-variables/graph/badge.svg)](https://codecov.io/github/wtsi-hgi/gitlab-build-variables)
 
 # GitLab Build Variables
 _Tools for dealing with GitLab CI pipeline build variables._
