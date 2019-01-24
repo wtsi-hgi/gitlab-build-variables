@@ -4,7 +4,8 @@ import sys
 from typing import List
 
 from gitlabbuildvariables.common import GitLabConfig
-from gitlabbuildvariables.executables._common import add_common_arguments, ProjectRunConfig
+from gitlabbuildvariables.executables._common import add_common_arguments, ProjectRunConfig, \
+    read_configuration_from_environment
 from gitlabbuildvariables.manager import ProjectVariablesManager
 
 
@@ -18,7 +19,14 @@ def _parse_args(args: List[str]) -> ProjectRunConfig:
                                                                               "build variables")
     add_common_arguments(parser, project=True)
     arguments = parser.parse_args(args)
-    return ProjectRunConfig(project=arguments.project, url=arguments.url, token=arguments.token, debug=arguments.debug)
+
+    environment_configuration = read_configuration_from_environment()
+
+    return ProjectRunConfig(
+        project=arguments.project,
+        url=arguments.url if arguments.url is not None else environment_configuration.url,
+        token=arguments.token if arguments.token is not None else environment_configuration.token,
+        debug=arguments.debug)
 
 
 def main():

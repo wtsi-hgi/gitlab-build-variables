@@ -4,7 +4,8 @@ import sys
 from typing import List
 
 from gitlabbuildvariables.common import GitLabConfig
-from gitlabbuildvariables.executables._common import add_common_arguments, RunConfig
+from gitlabbuildvariables.executables._common import add_common_arguments, RunConfig, \
+    read_configuration_from_environment
 from gitlabbuildvariables.update import logger, FileBasedProjectVariablesUpdaterBuilder, \
     FileBasedProjectsVariablesUpdater
 
@@ -35,11 +36,15 @@ def _parse_args(args: List[str]) -> _UpdateArgumentsRunConfig:
                         help="Directory from which variable settings groups may be sourced")
     parser.add_argument("--default-setting-extension", dest="default_setting_extensions",nargs="+", type=str,
                         help="Extensions to try adding to the variable to source location if it does not exist")
-
     arguments = parser.parse_args(args)
+
+    environment_configuration = read_configuration_from_environment()
+
     return _UpdateArgumentsRunConfig(
         arguments.config_location, arguments.setting_repository, arguments.default_setting_extensions,
-        url=arguments.url, token=arguments.token, debug=arguments.debug)
+        url=arguments.url if arguments.url is not None else environment_configuration.url,
+        token=arguments.token if arguments.token is not None else environment_configuration.token,
+        debug=arguments.debug)
 
 
 def main():
